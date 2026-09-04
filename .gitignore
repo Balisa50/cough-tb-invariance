@@ -1,0 +1,8 @@
+data/raw/
+data/interim/
+*.wav
+__pycache__/
+*.pyc
+.venv/
+results/*.csv
+.ipynb_checkpoints/
