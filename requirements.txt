@@ -1,0 +1,12 @@
+# Pinned to what is verified working on this machine.
+# torchaudio is deliberately absent: its binary does not load against torch
+# 2.11 here, and librosa plus soundfile cover everything needed without a
+# fragile native dependency.
+numpy>=2.1
+pandas>=2.2
+scipy>=1.13
+scikit-learn>=1.7
+torch>=2.5
+librosa>=1.0
+soundfile>=0.13
+pytest>=8.0

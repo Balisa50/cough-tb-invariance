@@ -1,0 +1,102 @@
+{
+  "dataset": "synthetic",
+  "config": {
+    "epochs": 3,
+    "batch_size": 32,
+    "seed": 0
+  },
+  "arms": {
+    "baseline": [
+      {
+        "site": "site_0",
+        "auc": 1.0,
+        "spec_at_90_sens": 1.0,
+        "prevalence": 0.1,
+        "site_probe_accuracy": 0.3708333373069763,
+        "site_chance": 0.3333333333333333,
+        "site_leak": 0.037500003973643004,
+        "prevalence_null_auc": 0.6923076923076923,
+        "n_participants": 20
+      },
+      {
+        "site": "site_1",
+        "auc": 1.0,
+        "spec_at_90_sens": 1.0,
+        "prevalence": 0.35,
+        "site_probe_accuracy": 0.44583332538604736,
+        "site_chance": 0.3333333333333333,
+        "site_leak": 0.11249999205271405,
+        "prevalence_null_auc": 0.6923076923076923,
+        "n_participants": 20
+      },
+      {
+        "site": "site_2",
+        "auc": 1.0,
+        "spec_at_90_sens": 1.0,
+        "prevalence": 0.4,
+        "site_probe_accuracy": 0.4124999940395355,
+        "site_chance": 0.3333333333333333,
+        "site_leak": 0.07916666070620221,
+        "prevalence_null_auc": 0.6923076923076923,
+        "n_participants": 20
+      },
+      {
+        "site": "site_3",
+        "auc": 1.0,
+        "spec_at_90_sens": 1.0,
+        "prevalence": 0.55,
+        "site_probe_accuracy": 0.4166666567325592,
+        "site_chance": 0.3333333333333333,
+        "site_leak": 0.08333332339922589,
+        "prevalence_null_auc": 0.6923076923076923,
+        "n_participants": 20
+      }
+    ],
+    "intervention": [
+      {
+        "site": "site_0",
+        "auc": 1.0,
+        "spec_at_90_sens": 1.0,
+        "prevalence": 0.1,
+        "site_probe_accuracy": 0.3916666805744171,
+        "site_chance": 0.3333333333333333,
+        "site_leak": 0.0583333472410838,
+        "prevalence_null_auc": 0.6923076923076923,
+        "n_participants": 20
+      },
+      {
+        "site": "site_1",
+        "auc": 1.0,
+        "spec_at_90_sens": 1.0,
+        "prevalence": 0.35,
+        "site_probe_accuracy": 0.44583332538604736,
+        "site_chance": 0.3333333333333333,
+        "site_leak": 0.11249999205271405,
+        "prevalence_null_auc": 0.6923076923076923,
+        "n_participants": 20
+      },
+      {
+        "site": "site_2",
+        "auc": 1.0,
+        "spec_at_90_sens": 1.0,
+        "prevalence": 0.4,
+        "site_probe_accuracy": 0.44999998807907104,
+        "site_chance": 0.3333333333333333,
+        "site_leak": 0.11666665474573773,
+        "prevalence_null_auc": 0.6923076923076923,
+        "n_participants": 20
+      },
+      {
+        "site": "site_3",
+        "auc": 1.0,
+        "spec_at_90_sens": 1.0,
+        "prevalence": 0.55,
+        "site_probe_accuracy": 0.4375,
+        "site_chance": 0.3333333333333333,
+        "site_leak": 0.10416666666666669,
+        "prevalence_null_auc": 0.6923076923076923,
+        "n_participants": 20
+      }
+    ]
+  }
+}
