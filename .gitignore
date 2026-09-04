@@ -6,3 +6,9 @@ __pycache__/
 .venv/
 results/*.csv
 .ipynb_checkpoints/
+
+# Correspondence and the access application. These carry a personal email
+# address and a candid account of why institutional validation is not
+# available, which is fine to write down and not something to publish before
+# the people concerned have read it.
+private/
