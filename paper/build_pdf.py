@@ -31,6 +31,10 @@ html, body { background:#FFFFFF !important; }
 body { font-size: 10.3pt; line-height: 1.5; }
 .page { max-width: none; padding: 0; gap: 1.4rem; }
 :root { --measure: 100%; }
+/* The screen stylesheet caps abstract paragraphs at 64ch for reading
+   comfort. On A4 that fills about two thirds of the column and leaves a
+   conspicuous void down the right of the first page. */
+.abstract p { max-width: none; }
 h1 { font-size: 21pt; line-height: 1.12; }
 .standfirst { font-size: 11pt; }
 .byline { font-size: 8.2pt; gap: 0.22rem 1.3rem; }
