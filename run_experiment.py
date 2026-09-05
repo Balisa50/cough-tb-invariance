@@ -23,8 +23,8 @@ import pandas as pd
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from src.data import (  # noqa: E402
-    manifest_from_coda, manifest_from_coswara, manifest_from_synthetic,
-    manifest_summary,
+    manifest_from_coda, manifest_from_coswara, manifest_from_coughvid,
+    manifest_from_synthetic, manifest_summary,
 )
 from src.train import Config, compare, run_experiment  # noqa: E402
 
@@ -37,6 +37,14 @@ def build_manifest(args) -> pd.DataFrame:
         )
     if args.dataset == "coswara":
         return manifest_from_coswara(args.root, args.meta)
+    if args.dataset == "coughvid":
+        return manifest_from_coughvid(
+            args.root, args.meta,
+            cough_threshold=args.cough_threshold,
+            min_site_clips=args.min_site_clips,
+            min_site_positives=args.min_site_positives,
+            include_symptomatic=args.include_symptomatic,
+        )
     if args.dataset == "coda":
         return manifest_from_coda(args.root, args.meta)
     raise ValueError(f"unknown dataset: {args.dataset}")
@@ -45,7 +53,7 @@ def build_manifest(args) -> pd.DataFrame:
 def main() -> int:
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--dataset", default="synthetic",
-                   choices=["synthetic", "coswara", "coda"])
+                   choices=["synthetic", "coswara", "coda", "coughvid"])
     p.add_argument("--root", help="audio directory")
     p.add_argument("--meta", help="metadata csv")
     p.add_argument("--epochs", type=int, default=12)
@@ -53,6 +61,15 @@ def main() -> int:
     p.add_argument("--seed", type=int, default=0)
     p.add_argument("--n-sites", type=int, default=4, help="synthetic only")
     p.add_argument("--n-per-site", type=int, default=40, help="synthetic only")
+    p.add_argument("--cough-threshold", type=float, default=0.8,
+                   help="coughvid only: minimum cough_detected score")
+    p.add_argument("--min-site-clips", type=int, default=60,
+                   help="coughvid only: drop countries smaller than this")
+    p.add_argument("--min-site-positives", type=int, default=5,
+                   help="coughvid only: a fold needs positives to have an ROC")
+    p.add_argument("--include-symptomatic", action="store_true",
+                   help="coughvid only: count symptomatic as negative rather "
+                        "than dropping it")
     p.add_argument("--out", default="results", help="where to write the json")
     args = p.parse_args()
 
@@ -65,7 +82,11 @@ def main() -> int:
             "not\n  cough classification, and must never be reported as a result."
         )
 
-    shared = dict(epochs=args.epochs, batch_size=args.batch_size, seed=args.seed)
+    # Synthetic clips are the cough itself; real recordings hide it inside
+    # several seconds of audio and must be cropped by energy.
+    crop = "head" if args.dataset == "synthetic" else "loudest"
+    shared = dict(epochs=args.epochs, batch_size=args.batch_size,
+                  seed=args.seed, crop=crop)
 
     print("\nBASELINE  (no adversary, no augmentation)")
     print("-" * 62)

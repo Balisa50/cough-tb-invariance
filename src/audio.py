@@ -216,3 +216,34 @@ def synthetic_cough(
 
     x = np.fft.irfft(spectrum * 10 ** (response_db / 20.0), n=n)
     return (x / (np.max(np.abs(x)) + 1e-9)).astype(np.float32)
+
+
+def loudest_window(
+    waveform: np.ndarray, sr: int = SAMPLE_RATE, seconds: float = CLIP_SECONDS
+) -> np.ndarray:
+    """
+    Return the highest-energy window of the requested length.
+
+    `fix_length` takes the opening of a clip, which is correct for the
+    synthetic fixture because those clips are the cough and nothing else.
+    Crowdsourced recordings are not like that: they run several seconds and
+    the cough rarely starts at zero, because people press record, pause, and
+    then cough. Taking the first half second would feed the model room tone,
+    which is precisely the channel signature this project exists to remove,
+    while discarding the cough it is supposed to classify.
+
+    Selecting by energy is a deliberate simplicity. A cough is the loudest
+    thing in a cough recording, so this needs no detector and cannot silently
+    mis-train on one. It does inherit an obvious failure mode: a clip whose
+    loudest moment is a door slam yields the door slam. `cough_detected`
+    filtering upstream is what keeps that rare.
+    """
+    target = int(sr * seconds)
+    if len(waveform) <= target:
+        return np.pad(waveform, (0, target - len(waveform)))
+
+    hop = max(1, target // 4)
+    starts = range(0, len(waveform) - target + 1, hop)
+    energies = [float(waveform[s:s + target] @ waveform[s:s + target]) for s in starts]
+    start = list(starts)[int(np.argmax(energies))]
+    return waveform[start:start + target]

@@ -39,6 +39,9 @@ class Config:
     probe_epochs: int = 40
     seed: int = 0
     device: str = "cpu"
+    # "head" for the synthetic fixture, "loudest" for real recordings
+    # where the cough is somewhere inside several seconds of audio.
+    crop: str = "head"
 
     @property
     def arm(self) -> str:
@@ -155,9 +158,10 @@ def run_fold(manifest: pd.DataFrame, held_out, train_idx, test_idx, cfg: Config)
     train_sites = sorted(train_meta["site"].unique())
     site_to_index = {s: i for i, s in enumerate(train_sites)}
 
-    train_ds = CoughDataset(train_meta, site_to_index, augment=cfg.augment, seed=cfg.seed)
+    train_ds = CoughDataset(train_meta, site_to_index, augment=cfg.augment,
+                            seed=cfg.seed, crop=cfg.crop)
     test_ds = CoughDataset(test_meta, {s: 0 for s in test_meta["site"].unique()},
-                           augment=False)
+                           augment=False, crop=cfg.crop)
 
     train_loader = DataLoader(train_ds, batch_size=cfg.batch_size, shuffle=True)
     test_loader = DataLoader(test_ds, batch_size=cfg.batch_size, shuffle=False)
