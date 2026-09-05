@@ -1,0 +1,617 @@
+<title>Cough Screening Learns Geography</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,300;0,400;0,600;1,400&family=Archivo:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+  :root {
+    --paper:      #F7F8FA;
+    --surface:    #FFFFFF;
+    --ink:        #14181F;
+    --muted:      #58616F;
+    --faint:      #8A93A1;
+    --rule:       #DCE0E7;
+    --rule-soft:  #E8EBF0;
+    --confound:   #A9670A;
+    --confound-w: #FBF3E4;
+    --method:     #0B6A66;
+    --method-w:   #E6F2F1;
+    --chance:     #9AA3B0;
+    --measure: 68ch;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper:      #0E1116;
+      --surface:    #151A21;
+      --ink:        #E4E8EE;
+      --muted:      #9AA4B2;
+      --faint:      #6B7482;
+      --rule:       #2A313B;
+      --rule-soft:  #1E242C;
+      --confound:   #E0A44A;
+      --confound-w: #241B0C;
+      --method:     #4FC4BC;
+      --method-w:   #0C2422;
+      --chance:     #6B7482;
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper:      #0E1116;
+    --surface:    #151A21;
+    --ink:        #E4E8EE;
+    --muted:      #9AA4B2;
+    --faint:      #6B7482;
+    --rule:       #2A313B;
+    --rule-soft:  #1E242C;
+    --confound:   #E0A44A;
+    --confound-w: #241B0C;
+    --method:     #4FC4BC;
+    --method-w:   #0C2422;
+    --chance:     #6B7482;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: Spectral, Georgia, "Times New Roman", serif;
+    font-size: 17px;
+    line-height: 1.62;
+    font-weight: 300;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .page {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 4rem 1.5rem 6rem;
+    display: flex;
+    flex-direction: column;
+    gap: 2.4rem;
+  }
+  .col { max-width: var(--measure); }
+
+  /* ── masthead ─────────────────────────────────────────────── */
+  header { display: flex; flex-direction: column; gap: 1.1rem; }
+  .eyebrow {
+    font-family: Archivo, system-ui, sans-serif;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+    color: var(--confound);
+  }
+  h1 {
+    font-family: Spectral, Georgia, serif;
+    font-size: clamp(2.1rem, 5.2vw, 3.15rem);
+    font-weight: 600;
+    line-height: 1.08;
+    letter-spacing: -0.018em;
+    margin: 0;
+    text-wrap: balance;
+  }
+  .standfirst {
+    font-size: 1.16rem;
+    line-height: 1.55;
+    color: var(--muted);
+    font-style: italic;
+    max-width: var(--measure);
+    margin: 0;
+  }
+  .byline {
+    font-family: Archivo, system-ui, sans-serif;
+    font-size: 0.85rem;
+    line-height: 1.65;
+    color: var(--muted);
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+    padding: 0.9rem 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem 2rem;
+  }
+  .byline strong { color: var(--ink); font-weight: 600; }
+  .byline a { color: var(--method); text-decoration: none; border-bottom: 1px solid var(--rule); }
+  .byline a:hover { border-bottom-color: var(--method); }
+
+  /* ── abstract ─────────────────────────────────────────────── */
+  .abstract {
+    background: var(--surface);
+    border-left: 3px solid var(--confound);
+    padding: 1.5rem 1.7rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+  }
+  .abstract h2 {
+    font-family: Archivo, system-ui, sans-serif;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+    color: var(--faint);
+    margin: 0;
+  }
+  .abstract p { margin: 0; max-width: 64ch; }
+
+  /* ── sections ─────────────────────────────────────────────── */
+  section { display: flex; flex-direction: column; gap: 1rem; }
+  h2.sec {
+    font-family: Spectral, Georgia, serif;
+    font-size: 1.42rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    margin: 1.4rem 0 0;
+    display: flex;
+    align-items: baseline;
+    gap: 0.7rem;
+    text-wrap: balance;
+  }
+  h2.sec .num {
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: var(--confound);
+  }
+  h3.sub {
+    font-family: Archivo, system-ui, sans-serif;
+    font-size: 0.94rem;
+    font-weight: 600;
+    letter-spacing: 0.005em;
+    margin: 0.9rem 0 0;
+    color: var(--ink);
+  }
+  p { margin: 0; max-width: var(--measure); }
+  strong { font-weight: 600; }
+  em { font-style: italic; }
+
+  ul.notes {
+    margin: 0;
+    padding-left: 1.15rem;
+    max-width: var(--measure);
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+  ul.notes li::marker { color: var(--faint); }
+
+  code, .mono {
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    font-size: 0.86em;
+    font-variant-numeric: tabular-nums;
+  }
+  code {
+    background: var(--rule-soft);
+    padding: 0.1em 0.35em;
+    border-radius: 2px;
+  }
+
+  /* ── figures ──────────────────────────────────────────────── */
+  figure {
+    margin: 0.8rem 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  .figbody {
+    background: var(--surface);
+    border: 1px solid var(--rule-soft);
+    padding: 1.2rem 1rem;
+    overflow-x: auto;
+  }
+  figcaption {
+    font-family: Archivo, system-ui, sans-serif;
+    font-size: 0.79rem;
+    line-height: 1.55;
+    color: var(--muted);
+    max-width: var(--measure);
+  }
+  figcaption .lab {
+    font-weight: 600;
+    color: var(--ink);
+    letter-spacing: 0.02em;
+  }
+  svg { display: block; width: 100%; height: auto; }
+  svg text { font-family: Archivo, system-ui, sans-serif; }
+  svg .tick { font-size: 11px; fill: var(--faint); }
+  svg .rowlab { font-size: 12px; fill: var(--muted); font-weight: 500; }
+  svg .keylab { font-size: 11.5px; fill: var(--muted); }
+  svg .reflab { font-size: 11px; font-weight: 600; }
+
+  /* ── tables ───────────────────────────────────────────────── */
+  .tablewrap { overflow-x: auto; border: 1px solid var(--rule-soft); background: var(--surface); }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    font-family: Archivo, system-ui, sans-serif;
+    font-size: 0.83rem;
+  }
+  th, td {
+    padding: 0.5rem 0.7rem;
+    text-align: right;
+    border-bottom: 1px solid var(--rule-soft);
+    white-space: nowrap;
+  }
+  th:first-child, td:first-child { text-align: left; }
+  thead th {
+    font-weight: 600;
+    font-size: 0.7rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--faint);
+    border-bottom: 1px solid var(--rule);
+  }
+  thead tr.grouped th {
+    text-transform: none;
+    letter-spacing: 0.02em;
+    font-size: 0.72rem;
+    border-bottom: none;
+    padding-bottom: 0.15rem;
+  }
+  .g-base { color: var(--muted); }
+  .g-interv { color: var(--method); }
+  td.num { font-family: "JetBrains Mono", ui-monospace, monospace; font-variant-numeric: tabular-nums; }
+  tbody tr:last-child td { border-bottom: none; }
+  tr.total td { border-top: 1px solid var(--rule); font-weight: 600; background: var(--rule-soft); }
+  .hi-c { color: var(--confound); font-weight: 600; }
+  .hi-m { color: var(--method); font-weight: 600; }
+
+  /* ── the two-claim panel ──────────────────────────────────── */
+  .claims { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1rem; }
+  .claim {
+    background: var(--surface);
+    padding: 1.15rem 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    border-top: 2px solid var(--rule);
+  }
+  .claim.yes { border-top-color: var(--method); }
+  .claim.no  { border-top-color: var(--confound); }
+  .claim .verdict {
+    font-family: Archivo, system-ui, sans-serif;
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+  .claim.yes .verdict { color: var(--method); }
+  .claim.no  .verdict { color: var(--confound); }
+  .claim .stmt { font-size: 1.02rem; line-height: 1.42; font-weight: 400; }
+  .claim .ev {
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    font-size: 0.76rem;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+    line-height: 1.55;
+  }
+
+  /* ── references ───────────────────────────────────────────── */
+  .refs { display: flex; flex-direction: column; gap: 0.7rem; }
+  .refs li {
+    font-size: 0.87rem;
+    line-height: 1.5;
+    color: var(--muted);
+    max-width: var(--measure);
+  }
+  .refs a { color: var(--method); text-decoration: none; border-bottom: 1px solid var(--rule); }
+  .refs a:hover { border-bottom-color: var(--method); }
+  ol.refs { padding-left: 1.3rem; margin: 0; }
+
+  footer {
+    border-top: 1px solid var(--rule);
+    padding-top: 1.2rem;
+    font-family: Archivo, system-ui, sans-serif;
+    font-size: 0.79rem;
+    color: var(--faint);
+    line-height: 1.6;
+    max-width: var(--measure);
+  }
+  footer a { color: var(--method); text-decoration: none; border-bottom: 1px solid var(--rule); }
+
+  a:focus-visible, [tabindex]:focus-visible {
+    outline: 2px solid var(--method);
+    outline-offset: 2px;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    * { animation: none !important; transition: none !important; }
+  }
+  @media (max-width: 640px) {
+    body { font-size: 16px; }
+    .page { padding: 2.5rem 1.1rem 4rem; }
+  }
+</style>
+
+<div class="page">
+
+  <header>
+    <div class="eyebrow">Preprint &middot; Machine learning for health</div>
+    <h1>Site-invariant representations for cough-audio screening: removing the confound does not recover disease signal</h1>
+    <p class="standfirst">A leave-one-country-out evaluation of adversarial domain-invariance on 2,739 crowdsourced cough recordings from nine countries.</p>
+    <div class="byline">
+      <span><strong>Abdoulie Balisa</strong></span>
+      <span>BSc Statistics, Kwame Nkrumah University of Science and Technology, Kumasi, Ghana</span>
+      <span><a href="mailto:abalisa@st.knust.edu.gh">abalisa@st.knust.edu.gh</a></span>
+      <span>5 September 2026</span>
+      <span><a href="https://github.com/Balisa50/cough-tb-invariance">github.com/Balisa50/cough-tb-invariance</a></span>
+    </div>
+  </header>
+
+  <div class="abstract">
+    <h2>Abstract</h2>
+    <p>Cough-audio classifiers for respiratory disease report high in-domain accuracy and degrade sharply at new recording sites. Recent work attributes this failure to learned representations that organise by recording device and source dataset rather than by disease status, with predicted probability tracking country-level prevalence. That work diagnosed the problem but did not attempt to correct it. We implement a correction combining randomised device simulation with an adversarial site head trained through a gradient reversal layer, and we audit the outcome using a probe trained on frozen features to recover the recording site, so that invariance is measured directly rather than inferred from classification accuracy.</p>
+    <p>We evaluate on 2,739 COUGHVID recordings from nine countries under leave-one-country-out cross-validation, reporting specificity at 90 percent sensitivity as the operating point. The intervention removes site information: probe leakage falls from 0.018 to zero in eight of nine folds (Wilcoxon signed-rank, <span class="mono">p&nbsp;=&nbsp;0.012</span>). Disease performance does not change (mean AUC 0.464 to 0.489, <span class="mono">p&nbsp;=&nbsp;0.359</span>). A null model that discards the audio entirely and predicts each country's base rate achieves an AUC of <span class="mono">0.741</span>, exceeding every fold measured in this study. We conclude that the invariance mechanism functions as intended, and that this corpus contains no cross-country disease signal for it to preserve.</p>
+  </div>
+
+  <section>
+    <h2 class="sec"><span class="num">1</span> Introduction</h2>
+    <p>Automated cough analysis has been proposed as a triage tool for tuberculosis and other respiratory conditions, motivated by the low cost of audio capture relative to microbiological testing. Reported accuracies are frequently high. Performance at sites not represented in training is considerably lower, and the discrepancy has generally been attributed to population differences rather than to acquisition conditions.</p>
+    <p>Zhang et al. [1] conducted the first systematic cross-dataset evaluation of this literature and reached a different conclusion. Learned representations clustered by recording device and source dataset rather than by disease status. Predicted probability tracked country-level prevalence. Cross-dataset AUC fell below 0.6 throughout: a model trained in Zambia achieved 0.755 on held-out Zambian data and 0.581 on the CODA corpus. Their analysis established that acquisition variability, rather than population shift, accounts for the greater part of the observed degradation.</p>
+    <p>That finding leaves an open question. If site dependence can be removed from the representation, reported performance should survive its removal. If it cannot be removed, or if performance collapses once it is, then the reported performance was the confound. No published implementation has attempted the removal and re-measured, and we are not aware of any public code for device-invariant cough modelling.</p>
+    <p>This paper reports such an attempt. The contribution is threefold. First, we implement domain-invariant training for cough audio and release the code. Second, we introduce an explicit audit of the invariance claim in the form of a site probe, so that the mechanism is verified rather than assumed. Third, we report a negative result on COUGHVID under a strict evaluation protocol, and we quantify the confound using a prevalence-only null model that has not previously been reported for this task.</p>
+  </section>
+
+  <section>
+    <h2 class="sec"><span class="num">2</span> Related work</h2>
+    <p>Domain-adversarial training was introduced by Ganin and Lempitsky [2], who placed a gradient reversal layer between a shared encoder and a domain classifier, so that the encoder is optimised to make the domain unpredictable while the task head is optimised normally. The approach has since been applied widely in vision and speech, though rarely with independent verification that the domain information was in fact removed.</p>
+    <p>In respiratory audio, most published work reports within-corpus performance under random splits. Where cross-corpus evaluation is performed, it is typically presented as a robustness check rather than as the primary result. Zhang et al. [1] is the exception, and provides the motivation for the present work.</p>
+    <p>Crowdsourced cough corpora, of which COUGHVID [3] is the largest public example, were assembled during the COVID-19 pandemic and carry self-reported labels. CODA TB [4] provides microbiologically confirmed tuberculosis labels across seven countries, but requires institutional credentialling for access.</p>
+  </section>
+
+  <section>
+    <h2 class="sec"><span class="num">3</span> Methods</h2>
+    <h3 class="sub">3.1 Device simulation</h3>
+    <p>Each clip is re-coloured on every training epoch as though captured by a different handset. The simulator applies a random band-pass filter within the range occupied by mobile microphones, a spectral tilt, two resonant peaks at randomised centre frequencies, gain variation, an additive noise floor, and occasional soft clipping. Because the simulated device changes at every epoch, no consistent device signature remains available for identifying a site.</p>
+    <p>An initial implementation randomised only the spectral tilt and held resonances fixed. Devices distinguishable by their resonant peak remained fully distinguishable under that version. The augmentation family must therefore span the family of transformations that the hardware applies; any component left uncovered survives as an intact shortcut. Time-stretching and pitch-shifting were excluded deliberately, since those operations alter the cough itself rather than the recording channel.</p>
+    <h3 class="sub">3.2 Adversarial site head</h3>
+    <p>A second classification head predicts the recording site from the shared embedding. Its gradient is negated during backpropagation by a gradient reversal layer [2], so that the encoder is optimised to make site membership unpredictable from its own features. Reversal strength follows the schedule of Ganin and Lempitsky, rising from zero over the course of training, so that the encoder acquires useful features before the adversary begins to remove them.</p>
+    <h3 class="sub">3.3 The site probe</h3>
+    <p>Classification accuracy cannot establish whether site information was removed. After training, we therefore freeze the encoder and fit a fresh classifier on its features with the single objective of recovering the recording site. If that probe performs at chance, the information is absent. If it succeeds, the encoder has concealed site membership from its own adversary without discarding it, and the invariance claim fails regardless of the reported disease accuracy.</p>
+    <p>Every fold reports <em>site leak</em>, defined as probe accuracy above the majority-class baseline, which is 0.332 on this manifest. An improvement in classification accuracy unaccompanied by a reduction in site leak does not constitute invariance.</p>
+    <h3 class="sub">3.4 Architecture and training</h3>
+    <p>The encoder comprises four convolutional blocks over 64-band log-mel spectrograms, computed from half-second windows selected by signal energy, and produces a 128-dimensional embedding. Training runs for twelve epochs at batch size 32 with a learning rate of 0.001, on CPU. The probe is trained for 40 epochs on frozen features. Folds are deterministic under a fixed seed, which we verified by reproducing all nine baseline folds to three decimal places across independent runs.</p>
+  </section>
+
+  <section>
+    <h2 class="sec"><span class="num">4</span> Evaluation protocol</h2>
+    <p>Two constraints are enforced in code rather than by convention, since both are failure modes that yield optimistic and publishable results.</p>
+    <ul class="notes">
+      <li><strong>No participant spans a split.</strong> A single participant contributes multiple clips. Splitting clips at random places the same larynx on both sides of the partition, and measures memorisation rather than generalisation.</li>
+      <li><strong>The test site is unseen.</strong> Leave-one-country-out is the only partition under which identifying the site confers no advantage.</li>
+    </ul>
+    <p>The primary metric is specificity at 90 percent sensitivity, following the World Health Organization target product profile for tuberculosis triage tests [5], which specifies 70 percent specificity at that sensitivity. AUC is reported alongside, but is not the headline figure, since the two measures can diverge, and in these results they do.</p>
+    <p>Each fold additionally reports a prevalence-only null: the AUC obtained by assigning every participant the base rate of their own country while ignoring the audio entirely. This quantifies the confound identified by Zhang et al., and provides the reference against which any reported performance must be judged.</p>
+    <p>The protocol was validated before any real corpus was obtained, using a synthetic cohort constructed with no disease signal, in which the label is reachable only through site prevalence. A same-site random split scored 0.634 and appeared successful; the prevalence-only null scored 0.637; leave-one-site-out scored 0.499. The protocol therefore identified apparent skill as an artefact of geography in a setting where ground truth was known by construction.</p>
+  </section>
+
+  <section>
+    <h2 class="sec"><span class="num">5</span> Data</h2>
+    <p>COUGHVID [3] contains 20,072 crowdsourced submissions recorded during 2020 on participants' own devices. Relative to the seven controlled sites of CODA, device variation in COUGHVID is the phenomenon of interest rather than a proxy for it, which makes it a more demanding test of invariance rather than a less demanding one.</p>
+    <p>The corpus provides neither a site field nor participant identifiers. We derive country by reverse-geocoding the latitude and longitude present on 58 percent of rows, and we set <code>participant_id</code> to the submission identifier, since each uuid corresponds to one anonymous recording. Requiring a status label, a detected cough (the corpus <code>cough_detected</code> score above 0.8, as recommended in the data descriptor), and a location reduces the corpus to 4,409 clips. Restricting to COVID-19 against healthy, and excluding countries with fewer than 60 clips or 5 positive cases, yields the analysis set shown in Table 1.</p>
+
+    <figure>
+      <div class="tablewrap">
+        <table>
+          <thead>
+            <tr><th>Country</th><th>Clips</th><th>Positives</th><th>Prevalence</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Turkey</td><td class="num">830</td><td class="num">34</td><td class="num">0.041</td></tr>
+            <tr><td>Spain</td><td class="num">605</td><td class="num">46</td><td class="num">0.076</td></tr>
+            <tr><td>Uzbekistan</td><td class="num">488</td><td class="num">141</td><td class="num hi-c">0.289</td></tr>
+            <tr><td>United States</td><td class="num">231</td><td class="num">6</td><td class="num hi-c">0.026</td></tr>
+            <tr><td>Switzerland</td><td class="num">201</td><td class="num">19</td><td class="num">0.095</td></tr>
+            <tr><td>France</td><td class="num">115</td><td class="num">11</td><td class="num">0.096</td></tr>
+            <tr><td>Brazil</td><td class="num">110</td><td class="num">5</td><td class="num">0.045</td></tr>
+            <tr><td>Argentina</td><td class="num">96</td><td class="num">18</td><td class="num">0.188</td></tr>
+            <tr><td>Iran</td><td class="num">63</td><td class="num">16</td><td class="num">0.254</td></tr>
+            <tr class="total"><td>Total</td><td class="num">2,739</td><td class="num">296</td><td class="num">0.108</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <figcaption><span class="lab">Table 1.</span> The analysis set. Prevalence ranges from 0.026 in the United States to 0.289 in Uzbekistan, an elevenfold spread. This range determines the magnitude of the shortcut available to any model capable of identifying the recording country.</figcaption>
+    </figure>
+  </section>
+
+  <section>
+    <h2 class="sec"><span class="num">6</span> Results</h2>
+    <p>Nine folds were run under two arms over identical partitions. The baseline arm disables both the adversary and the augmentation; the intervention arm enables both.</p>
+
+    <figure>
+      <div class="figbody">
+        <svg viewBox="0 0 760 396" role="img" aria-label="Per-country AUC for both arms against chance and the prevalence-only null">
+          <rect x="100" y="46" width="240" height="272" fill="var(--rule-soft)" opacity="0.55"></rect>
+          <line x1="629" y1="40" x2="629" y2="324" stroke="var(--confound)" stroke-width="2"></line>
+          <text class="reflab" x="629" y="32" text-anchor="middle" fill="var(--confound)">0.741, country base rate alone</text>
+          <line x1="340" y1="46" x2="340" y2="324" stroke="var(--chance)" stroke-width="1" stroke-dasharray="3 3"></line>
+          <text class="reflab" x="340" y="338" text-anchor="middle" fill="var(--chance)">chance</text>
+          <line x1="100" y1="324" x2="700" y2="324" stroke="var(--rule)" stroke-width="1"></line>
+          <g class="tick" text-anchor="middle">
+            <text x="100" y="356">0.30</text><text x="220" y="356">0.40</text><text x="340" y="356">0.50</text>
+            <text x="460" y="356">0.60</text><text x="580" y="356">0.70</text><text x="700" y="356">0.80</text>
+          </g>
+          <text class="tick" x="400" y="382" text-anchor="middle">AUC on the held-out country</text>
+          <g>
+            <text class="rowlab" x="90" y="66" text-anchor="end">Argentina</text>
+            <line x1="181.6" y1="62" x2="257.2" y2="62" stroke="var(--rule)" stroke-width="1"></line>
+            <circle cx="181.6" cy="62" r="4.5" fill="var(--paper)" stroke="var(--muted)" stroke-width="1.6"></circle>
+            <circle cx="257.2" cy="62" r="4.5" fill="var(--method)"></circle>
+            <text class="rowlab" x="90" y="96" text-anchor="end">Brazil</text>
+            <line x1="210.4" y1="92" x2="215.2" y2="92" stroke="var(--rule)" stroke-width="1"></line>
+            <circle cx="210.4" cy="92" r="4.5" fill="var(--paper)" stroke="var(--muted)" stroke-width="1.6"></circle>
+            <circle cx="215.2" cy="92" r="4.5" fill="var(--method)"></circle>
+            <text class="rowlab" x="90" y="126" text-anchor="end">Switzerland</text>
+            <line x1="181.6" y1="122" x2="253.6" y2="122" stroke="var(--rule)" stroke-width="1"></line>
+            <circle cx="253.6" cy="122" r="4.5" fill="var(--paper)" stroke="var(--muted)" stroke-width="1.6"></circle>
+            <circle cx="181.6" cy="122" r="4.5" fill="var(--method)"></circle>
+            <text class="rowlab" x="90" y="156" text-anchor="end">Spain</text>
+            <line x1="302.8" y1="152" x2="362.8" y2="152" stroke="var(--rule)" stroke-width="1"></line>
+            <circle cx="362.8" cy="152" r="4.5" fill="var(--paper)" stroke="var(--muted)" stroke-width="1.6"></circle>
+            <circle cx="302.8" cy="152" r="4.5" fill="var(--method)"></circle>
+            <text class="rowlab" x="90" y="186" text-anchor="end">France</text>
+            <line x1="367.6" y1="182" x2="504.4" y2="182" stroke="var(--rule)" stroke-width="1"></line>
+            <circle cx="367.6" cy="182" r="4.5" fill="var(--paper)" stroke="var(--muted)" stroke-width="1.6"></circle>
+            <circle cx="504.4" cy="182" r="4.5" fill="var(--method)"></circle>
+            <text class="rowlab" x="90" y="216" text-anchor="end">Iran</text>
+            <line x1="367.6" y1="212" x2="450.4" y2="212" stroke="var(--rule)" stroke-width="1"></line>
+            <circle cx="367.6" cy="212" r="4.5" fill="var(--paper)" stroke="var(--muted)" stroke-width="1.6"></circle>
+            <circle cx="450.4" cy="212" r="4.5" fill="var(--method)"></circle>
+            <text class="rowlab" x="90" y="246" text-anchor="end">Turkey</text>
+            <line x1="350.8" y1="242" x2="398.8" y2="242" stroke="var(--rule)" stroke-width="1"></line>
+            <circle cx="398.8" cy="242" r="4.5" fill="var(--paper)" stroke="var(--muted)" stroke-width="1.6"></circle>
+            <circle cx="350.8" cy="242" r="4.5" fill="var(--method)"></circle>
+            <text class="rowlab" x="90" y="276" text-anchor="end">United States</text>
+            <line x1="252.4" y1="272" x2="278.8" y2="272" stroke="var(--rule)" stroke-width="1"></line>
+            <circle cx="278.8" cy="272" r="4.5" fill="var(--paper)" stroke="var(--muted)" stroke-width="1.6"></circle>
+            <circle cx="252.4" cy="272" r="4.5" fill="var(--method)"></circle>
+            <text class="rowlab" x="90" y="306" text-anchor="end">Uzbekistan</text>
+            <line x1="244" y1="302" x2="425.2" y2="302" stroke="var(--rule)" stroke-width="1"></line>
+            <circle cx="244" cy="302" r="4.5" fill="var(--paper)" stroke="var(--muted)" stroke-width="1.6"></circle>
+            <circle cx="425.2" cy="302" r="4.5" fill="var(--method)"></circle>
+          </g>
+          <g transform="translate(100, 20)">
+            <circle cx="6" cy="-4" r="4.5" fill="var(--paper)" stroke="var(--muted)" stroke-width="1.6"></circle>
+            <text class="keylab" x="18" y="0">baseline</text>
+            <circle cx="96" cy="-4" r="4.5" fill="var(--method)"></circle>
+            <text class="keylab" x="108" y="0">with invariance training</text>
+          </g>
+        </svg>
+      </div>
+      <figcaption><span class="lab">Figure 1.</span> All eighteen fold measurements on a single AUC axis. The shaded region lies below chance. No measurement reaches the prevalence-only null at 0.741. France and Uzbekistan show the largest movement under the intervention; both carry fewer than 20 positive cases, so these differences fall within sampling noise.</figcaption>
+    </figure>
+
+    <figure>
+      <div class="figbody">
+        <svg viewBox="0 0 760 290" role="img" aria-label="Site probe leakage before and after the intervention">
+          <line x1="140" y1="207" x2="620" y2="207" stroke="var(--rule)" stroke-width="1"></line>
+          <text class="tick" x="128" y="211" text-anchor="end">0.000</text>
+          <text class="tick" x="128" y="78" text-anchor="end">0.040</text>
+          <line x1="140" y1="74" x2="620" y2="74" stroke="var(--rule-soft)" stroke-width="1"></line>
+          <text class="tick" x="128" y="145" text-anchor="end">0.020</text>
+          <line x1="140" y1="141" x2="620" y2="141" stroke="var(--rule-soft)" stroke-width="1"></line>
+          <g stroke-width="1.5" fill="none" opacity="0.8">
+            <line x1="200" y1="63.7" x2="560" y2="207.0" stroke="var(--method)"></line>
+            <line x1="200" y1="110.3" x2="560" y2="207.0" stroke="var(--method)"></line>
+            <line x1="200" y1="120.3" x2="560" y2="203.7" stroke="var(--method)"></line>
+            <line x1="200" y1="120.3" x2="560" y2="230.3" stroke="var(--method)"></line>
+            <line x1="200" y1="167.0" x2="560" y2="207.0" stroke="var(--method)"></line>
+            <line x1="200" y1="170.3" x2="560" y2="203.7" stroke="var(--method)"></line>
+            <line x1="200" y1="173.7" x2="560" y2="207.0" stroke="var(--method)"></line>
+            <line x1="200" y1="193.7" x2="560" y2="187.0" stroke="var(--confound)"></line>
+            <line x1="200" y1="207.0" x2="560" y2="207.0" stroke="var(--method)"></line>
+          </g>
+          <g>
+            <circle cx="200" cy="63.7" r="3.5" fill="var(--muted)"></circle>
+            <circle cx="200" cy="110.3" r="3.5" fill="var(--muted)"></circle>
+            <circle cx="200" cy="120.3" r="3.5" fill="var(--muted)"></circle>
+            <circle cx="200" cy="167.0" r="3.5" fill="var(--muted)"></circle>
+            <circle cx="200" cy="170.3" r="3.5" fill="var(--muted)"></circle>
+            <circle cx="200" cy="173.7" r="3.5" fill="var(--muted)"></circle>
+            <circle cx="200" cy="193.7" r="3.5" fill="var(--muted)"></circle>
+            <circle cx="200" cy="207.0" r="3.5" fill="var(--muted)"></circle>
+            <circle cx="560" cy="207.0" r="3.5" fill="var(--method)"></circle>
+            <circle cx="560" cy="203.7" r="3.5" fill="var(--method)"></circle>
+            <circle cx="560" cy="230.3" r="3.5" fill="var(--method)"></circle>
+            <circle cx="560" cy="187.0" r="3.5" fill="var(--confound)"></circle>
+          </g>
+          <text class="rowlab" x="200" y="262" text-anchor="middle">baseline</text>
+          <text class="rowlab" x="560" y="262" text-anchor="middle">with invariance training</text>
+          <text class="tick" x="380" y="284" text-anchor="middle">site probe accuracy above its majority-class baseline</text>
+          <text class="reflab" x="632" y="211" fill="var(--muted)">no leak</text>
+        </svg>
+      </div>
+      <figcaption><span class="lab">Figure 2.</span> Site leakage by fold, before and after the intervention. Eight of nine folds fall to zero or below. The United States, shown in ochre, is the single exception, rising from 0.004 to 0.006; both values are small enough to represent noise about zero. Turkey, the leakiest fold at 0.043, is also the fold whose AUC declines most once the leak is removed.</figcaption>
+    </figure>
+
+    <figure>
+      <div class="tablewrap">
+        <table>
+          <thead>
+            <tr class="grouped">
+              <th></th>
+              <th colspan="3" class="g-base">Baseline</th>
+              <th colspan="3" class="g-interv">With invariance training</th>
+            </tr>
+            <tr>
+              <th>Held out</th><th>AUC</th><th>Spec@90</th><th>Leak</th><th>AUC</th><th>Spec@90</th><th>Leak</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Argentina</td><td class="num">0.368</td><td class="num">0.141</td><td class="num">0.029</td><td class="num">0.431</td><td class="num">0.051</td><td class="num">0.000</td></tr>
+            <tr><td>Brazil</td><td class="num">0.392</td><td class="num">0.124</td><td class="num">0.011</td><td class="num">0.396</td><td class="num">0.210</td><td class="num">0.001</td></tr>
+            <tr><td>Switzerland</td><td class="num">0.428</td><td class="num">0.033</td><td class="num">0.026</td><td class="num">0.368</td><td class="num">0.093</td><td class="num">0.001</td></tr>
+            <tr><td>Spain</td><td class="num">0.519</td><td class="num">0.193</td><td class="num">0.012</td><td class="num">0.469</td><td class="num">0.116</td><td class="num">0.000</td></tr>
+            <tr><td>France</td><td class="num">0.523</td><td class="num">0.077</td><td class="num">0.026</td><td class="num">0.637</td><td class="num">0.510</td><td class="num">&minus;0.007</td></tr>
+            <tr><td>Iran</td><td class="num">0.523</td><td class="num">0.043</td><td class="num">0.010</td><td class="num">0.592</td><td class="num">0.021</td><td class="num">0.000</td></tr>
+            <tr><td>Turkey</td><td class="num">0.549</td><td class="num">0.121</td><td class="num hi-c">0.043</td><td class="num">0.509</td><td class="num">0.113</td><td class="num">0.000</td></tr>
+            <tr><td>United States</td><td class="num">0.449</td><td class="num">0.120</td><td class="num">0.004</td><td class="num">0.427</td><td class="num">0.231</td><td class="num">0.006</td></tr>
+            <tr><td>Uzbekistan</td><td class="num">0.420</td><td class="num">0.017</td><td class="num">0.000</td><td class="num">0.571</td><td class="num">0.207</td><td class="num">0.000</td></tr>
+            <tr class="total"><td>Mean</td><td class="num">0.464</td><td class="num">0.096</td><td class="num">0.018</td><td class="num">0.489</td><td class="num">0.173</td><td class="num hi-m">0.000</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <figcaption><span class="lab">Table 2.</span> Complete fold-level results. Paired Wilcoxon signed-rank tests across the nine countries give <span class="mono">p&nbsp;=&nbsp;0.359</span> for AUC, <span class="mono">p&nbsp;=&nbsp;0.301</span> for specificity at 90 percent sensitivity, and <span class="mono">p&nbsp;=&nbsp;0.012</span> for site leak. Only the reduction in leak reaches significance. AUC improved in five of nine folds; leak fell in eight of nine.</figcaption>
+    </figure>
+
+    <h3 class="sub">6.1 Divergence between AUC and the operating point</h3>
+    <p>Iran gains AUC under the intervention, from 0.523 to 0.592, while its specificity at 90 percent sensitivity halves, from 0.043 to 0.021. Spain loses on both measures. Brazil is nearly unchanged on AUC and nearly doubles specificity. Because these measures move independently, a study reporting AUC alone could support several different conclusions from the same runs, depending on which folds it emphasised. Fixing the operating point in advance removes that latitude.</p>
+    <p>The strongest single fold in the study, France at 0.510 specificity, remains below the 0.70 required by the WHO target product profile, and rests on eleven positive cases.</p>
+  </section>
+
+  <section>
+    <h2 class="sec"><span class="num">7</span> Discussion</h2>
+    <div class="claims">
+      <div class="claim yes">
+        <div class="verdict">Hypothesis 1: supported</div>
+        <div class="stmt">Site information can be removed from the learned representation.</div>
+        <div class="ev">probe leak 0.018 to 0.000<br>8 of 9 folds, p = 0.012</div>
+      </div>
+      <div class="claim no">
+        <div class="verdict">Hypothesis 2: not supported</div>
+        <div class="stmt">Cough audio carries disease signal that generalises across countries.</div>
+        <div class="ev">AUC 0.464 to 0.489, p = 0.359<br>country base rate alone, 0.741</div>
+      </div>
+    </div>
+    <p>The invariance mechanism operates as designed on real audio. A probe trained specifically to defeat the claim cannot recover the recording country above its majority-class baseline. This constitutes stronger evidence than an improvement in classification accuracy, because it tests the mechanism directly rather than its intended consequence.</p>
+    <p>The corpus contains no cross-country disease signal. A mean AUC of 0.489 is indistinguishable from chance, and the prevalence-only null of 0.741 exceeds every individual fold measured. On these data, knowing a participant's country predicts their COVID-19 status substantially better than a convolutional network applied to their cough.</p>
+    <p>The magnitude of the null model merits attention, since it bears on the interpretation of prior results. Zhang et al. characterised cross-dataset AUC below 0.6 as degradation. Measured against a null that discards the audio, a stronger characterisation is warranted: on crowdsourced recordings the audio contributes nothing that transfers, and reported performance is largely a measurement of epidemiology. We suggest that a prevalence-only null be reported as standard in this literature, since without it a model that has learned only geography cannot be distinguished from one that has learned pathology.</p>
+    <p>These results also demonstrate that the protocol discriminates on real data, having previously been demonstrated only on a synthetic cohort. A within-site random split on this corpus would have produced apparently acceptable performance. Held out to an unseen country, performance falls below the null.</p>
+  </section>
+
+  <section>
+    <h2 class="sec"><span class="num">8</span> Limitations</h2>
+    <ul class="notes">
+      <li><strong>This is not a test of tuberculosis screening.</strong> COUGHVID labels record self-reported COVID-19 status, and only 4 percent of the corpus carries an expert diagnosis. A negative result here constrains claims about crowdsourced COVID-19 cough audio; it does not constrain claims about tuberculosis.</li>
+      <li><strong>The positive class is small.</strong> With 296 positives distributed across nine countries, several folds contain fewer than 20 positive cases, giving AUC confidence intervals wide enough to include chance. Fold-level differences should not be interpreted individually; the paired tests across folds carry the inference.</li>
+      <li><strong>No participant identifiers exist.</strong> Each uuid corresponds to one anonymous submission, so grouping operates at the level of the recording. A repeat submitter cannot be detected, and the guarantee weakens from "no participant spans a split" to "no recording spans a split". This is a property of the corpus that no protocol can repair.</li>
+      <li><strong>Country is a proxy for device rather than a measurement of it.</strong> Two countries may share a handset market, which would make the held-out unit weaker than intended. The site probe reports the separability actually achieved, which carries that uncertainty explicitly rather than assuming it away.</li>
+      <li><strong>Location is available on 58 percent of rows</strong>, reducing the usable set to 2,739 of 20,072. Whatever determines a participant's willingness to grant location permission may not be independent of other characteristics.</li>
+      <li><strong>A single architecture and hyperparameter configuration was evaluated.</strong> A larger encoder or a longer schedule might extract signal that this configuration cannot, although the margin separating measured performance from the prevalence null is wide enough that closing it would require more than parameter tuning.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2 class="sec"><span class="num">9</span> Conclusion</h2>
+    <p>Adversarial domain-invariance removes recording-site information from cough-audio representations, verified by a probe rather than inferred from accuracy. On COUGHVID this removal produces no change in disease classification, because the corpus contains no cross-country signal to preserve. A null model using country base rates alone outperforms every configuration tested.</p>
+    <p>Establishing whether the method benefits a corpus that does contain disease signal requires microbiologically confirmed labels. CODA TB [4] provides 2,143 participants across seven countries, four of them in Africa, with culture-confirmed outcomes. The method, the evaluation protocol and the manifest abstraction are dataset-agnostic by construction: incorporating a corpus requires implementing a single function that emits four columns, with no other modification. The apparatus is complete, and data access is the remaining constraint.</p>
+  </section>
+
+  <section>
+    <h2 class="sec"><span class="num">10</span> Code and data availability</h2>
+    <p>Source code, the evaluation protocol, complete fold-level results in JSON, and a checksum-verified downloader for COUGHVID are available at <a href="https://github.com/Balisa50/cough-tb-invariance">github.com/Balisa50/cough-tb-invariance</a>. All experiments run on CPU. A synthetic pathway reproduces the protocol validation without requiring any download. COUGHVID is distributed under CC BY 4.0 from Zenodo record 4048312.</p>
+  </section>
+
+  <section>
+    <h2 class="sec">References</h2>
+    <ol class="refs">
+      <li>Zhang, et al. Cross-dataset evaluation of cough-audio models for respiratory disease screening. <em>arXiv:2608.25846</em>, 2026.</li>
+      <li>Ganin, Y. and Lempitsky, V. Unsupervised domain adaptation by backpropagation. <em>Proceedings of the 32nd International Conference on Machine Learning</em>, 2015, pp. 1180&ndash;1189.</li>
+      <li>Orlandic, L., Teijeiro, T. and Atienza, D. The COUGHVID crowdsourcing dataset: a corpus for the study of large-scale cough analysis algorithms. <em>Scientific Data</em>, 2021. Zenodo record 4048312, CC BY 4.0.</li>
+      <li>CODA TB DREAM Challenge dataset. Synapse <span class="mono">syn31472953</span>.</li>
+      <li>World Health Organization. <em>High-priority target product profiles for new tuberculosis diagnostics: report of a consensus meeting</em>. Geneva, 2014.</li>
+    </ol>
+  </section>
+
+  <footer>
+    All figures and tables are generated programmatically from <span class="mono">results/coughvid_folds.json</span> in the accompanying repository rather than transcribed, so that published values cannot diverge from those the code produced. The commitment to report a null result as clearly as a positive one was recorded in the repository README before any real corpus was obtained.
+  </footer>
+
+</div>

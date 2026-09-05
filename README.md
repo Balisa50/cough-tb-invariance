@@ -127,6 +127,13 @@ src/train.py        training, the probe audit, baseline vs intervention
 run_experiment.py   one command
 ```
 
+## Paper
+
+The result below is written up in full at
+[`paper/`](paper/Balisa-2026-site-invariant-cough-screening.pdf): method,
+evaluation protocol, all eighteen folds, and the limitations that a corpus of
+self-reported labels imposes on any conclusion drawn from it.
+
 ## Result: COUGHVID
 
 2,739 recordings, 9 countries, COVID-19 against healthy, leave-one-country-out.
